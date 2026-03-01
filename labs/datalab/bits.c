@@ -143,7 +143,7 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+  return ~(~(~x & y) & ~(x & ~y));
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -153,7 +153,7 @@ int bitXor(int x, int y) {
  */
 int tmin(void) {
 
-  return 2;
+  return ~0<<31;
 
 }
 //2
@@ -165,7 +165,7 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+  return (!(~x^(x+1)) & !!(x+1));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -176,7 +176,10 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+  /*通过一个小的分型堆叠4次规避不能使用大数字的问题*/
+  int root = 0xAA;
+  int mask = root<<24 | root<<16 | root<<8 | root;
+  return !((x & mask) ^ mask);
 }
 /* 
  * negate - return -x 
@@ -186,7 +189,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return ~x+1;
 }
 //3
 /* 
@@ -199,7 +202,7 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  return !!((~x+0x30) & 1<<31) & !((~x+0x3a) & 1<<31);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -209,7 +212,7 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  return (y & !!x<<31>>31) | (z & !x<<31>>31);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -219,7 +222,8 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  /*特判，溢出的情况会导致失效，但是溢出只会发生在符号不同（一边>=0，另一边<0）的时候*/
+  return !(!(x & 1<<31) & !!(y & 1<<31)) & (!!((x+~y) & 1<<31) | (!!(x & 1<<31) & !(y & 1<<31)));
 }
 //4
 /* 
@@ -231,7 +235,10 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+  /*排除正的，排除负的*/
+  int isNotNegative = ~(x>>31) & 1;
+  int isNotPositive = ~((~x+1)>>31) & 1;
+  return isNotNegative & isNotPositive;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -246,7 +253,19 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  int isNegative = !!(x>>31);
+  int abs = ((isNegative<<31>>31) ^ x);
+  int cond16 = !!(abs>>16)<<31>>31;
+  int d16 = ((abs>>16) & cond16) | (abs & ~cond16);
+  int cond8 = !!(d16>>8)<<31>>31;
+  int d8 = ((d16>>8) & cond8 | (d16 & ~cond8));
+  int cond4 = !!(d8>>4)<<31>>31;
+  int d4 = ((d8>>4) & cond4 | (d8 & ~cond4));
+  int cond2 = !!(d4>>2)<<31>>31;
+  int d2 = ((d4>>2) & cond2 | (d4 & ~cond2));
+  int cond1 = !!(d2>>1)<<31>>31;
+  int d1 = ((d2>>1) & cond1 | (d2 & ~cond1));
+  return 1 + (!!cond16<<4) + (!!cond8<<3) + (!!cond4<<2) + (!!cond2<<1) + (!!cond1) + d1;
 }
 //float
 /* 
@@ -261,7 +280,19 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  unsigned mask = (1<<31) + (~(1<<31)>>8);
+  unsigned exp = uf & ~mask;
+  if(!(exp ^ ~mask)){
+    return uf;
+  }else if(!!(exp ^ 0)){
+    int newExp = (uf & ~mask)+(1<<23);
+    if(!(newExp ^ ~mask)){
+      return (newExp & ~mask) + (uf>>31<<31);
+    }
+    return (newExp & ~mask) + (uf & mask);
+  }else{
+    return (uf<<1) + (uf>>31<<31);
+  }
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -276,7 +307,35 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  unsigned mask = (1<<31) + (~(1<<31)>>8);
+  unsigned exp = (uf & ~mask)>>23;
+  int E = exp-127;
+  int i = 0;
+  int ans = 0;
+  /*特判*/
+  if(!!((~E+31) & 1<<31)){
+    return 0x80000000u;
+  }
+  if(!(exp ^ 0)){
+    return 0;
+  }
+  /*映射*/
+  while (!((~i+24) & 1<<31)){
+    int power = E+i+~23+1;
+    if(!!((~power) & 1<<31) & !((~power+31) & 1<<31)){
+      if(!(i ^ 23)){
+        ans += (1<<power);
+      }else{
+        ans += ((uf>>i & 1)<<power);
+      }
+    }
+    i++;
+  }
+  /*加符号*/
+  if(((uf>>31) & 1) && !!(ans^0)){
+    ans = (~ans + 1);
+  }
+  return ans;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -292,5 +351,13 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  if(x>=128){
+    return 0x7f800000u;
+  }else if(x<-149){
+    return 0;
+  }else if(-149<=x<-126){
+    return 1<<(x+149);
+  }else{
+    return (x+127)<<23;
+  }
 }
