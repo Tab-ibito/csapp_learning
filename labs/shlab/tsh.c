@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 	    break;
 	default:
             usage();
-	}
+	    }
     }
 
     /* Install the signal handlers */
@@ -165,6 +165,44 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline) 
 {
+    char *argv[MAXARGS];
+    char buf[MAXLINE];
+    int bg;
+
+    sigset_t mask, prev_mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+
+    strcpy(buf, cmdline);
+    bg = parseline(buf, argv); 
+
+    if (argv[0] == NULL) {
+        return;
+    }
+
+    if (!builtin_cmd(argv)){
+        sigprocmask(SIG_BLOCK, &mask, &prev_mask);
+        pid_t pid = fork();
+        if (pid == 0) {
+            sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            setpgid(0, 0);
+            if(execve(argv[0], argv, environ)<0){
+                printf("%s: Command not found\n", argv[0]);
+                exit(0);
+            }
+        } else {
+            if (bg == 1){
+                addjob(jobs, pid, BG, cmdline);
+                printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+                fflush(stdout);
+                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+            } else {
+                addjob(jobs, pid, FG, cmdline);
+                sigprocmask(SIG_SETMASK, &prev_mask, NULL);
+                waitfg(pid);
+            }
+        }
+    }
     return;
 }
 
@@ -231,6 +269,18 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv) 
 {
+    
+    if (strcmp(argv[0], "quit") == 0){
+        exit(0);
+    }
+    if (strcmp(argv[0], "jobs") == 0){
+        listjobs(jobs);
+        return 1;
+    }
+    if (strcmp(argv[0], "fg") == 0 || strcmp(argv[0], "bg") == 0){
+        do_bgfg(argv);
+        return 1;
+    }
     return 0;     /* not a builtin command */
 }
 
@@ -239,6 +289,9 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv) 
 {
+    if (strcmp(argv[0], "fg") == 0) {
+
+    }
     return;
 }
 
@@ -247,6 +300,9 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
+    while (fgpid(jobs) == pid){
+        sleep(10);
+    }
     return;
 }
 
@@ -263,6 +319,13 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig) 
 {
+    pid_t pid;
+    int status;
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0){
+        if (WIFEXITED(status)){
+            deletejob(jobs, pid);
+        }
+    }
     return;
 }
 
@@ -311,7 +374,7 @@ void initjobs(struct job_t *jobs) {
 }
 
 /* maxjid - Returns largest allocated job ID */
-int maxjid(struct job_t *jobs) 
+int maxjid(struct job_t *jobs)
 {
     int i, max=0;
 
@@ -504,6 +567,5 @@ void sigquit_handler(int sig)
     printf("Terminating after receipt of SIGQUIT signal\n");
     exit(1);
 }
-
 
 
