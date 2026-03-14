@@ -289,8 +289,38 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv) 
 {
+    struct job_t *job;
+    if (argv[1] == NULL) {
+        printf("%s command requires PID or %%jobid argument\n", argv[0]);
+        return;
+    }
+    if (argv[1][0] == '%') {
+        int jid = atoi(&argv[1][1]);
+        job = getjobjid(jobs, jid);
+        
+        if (job == NULL) {
+            printf("%s: No such job\n", argv[1]);
+            return;
+        }
+    } 
+    else if (isdigit(argv[1][0])) {
+        int pid = atoi(argv[1]);
+        job = getjobpid(jobs, pid);
+        
+        if (job == NULL) {
+            printf("(%d): No such process\n", argv[1]);
+            return;
+        }
+    } else {
+        printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+        return;
+    }
+    kill(job->pid, SIGCONT);
     if (strcmp(argv[0], "fg") == 0) {
-
+        job->state = FG;
+        waitfg(job->pid);
+    } else {
+        job->state = BG;
     }
     return;
 }
@@ -322,9 +352,15 @@ void sigchld_handler(int sig)
     pid_t pid;
     int status;
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0){
-        if (WSTOPSIG(status)) {
+        if (WIFSTOPPED(status)) {     
+            printf("Job [%d] (%d) stopped by signal %d\n",pid2jid(pid), pid, WSTOPSIG(status));
+            fflush(stdout);
             getjobpid(jobs, pid)->state = ST;
-        }else if (WIFEXITED(status) || WTERMSIG(status)){
+        }else if (WIFEXITED(status)){
+            deletejob(jobs, pid);
+        }else if (WIFSIGNALED(status)){
+            printf("Job [%d] (%d) terminated by signal %d\n",pid2jid(pid), pid, WTERMSIG(status));
+            fflush(stdout);
             deletejob(jobs, pid);
         }
     }
@@ -332,7 +368,7 @@ void sigchld_handler(int sig)
 }
 
 /* 
- * sigint_handler - The kernel sends a SIGINT to the shell whenver the
+ * sigint_handler - The kernel sends a SIGINT to the shell whenever the
  *    user types ctrl-c at the keyboard.  Catch it and send it along
  *    to the foreground job.  
  */
@@ -340,8 +376,6 @@ void sigint_handler(int sig)
 {
     pid_t pid = fgpid(jobs);
     if (pid != 0) {
-        printf("Job [%d] (%d) terminated by signal %d\n",pid2jid(pid), pid, sig);
-        fflush(stdout);
         kill(-pid, SIGINT);
     }
     return;
@@ -356,8 +390,6 @@ void sigtstp_handler(int sig)
 {
     pid_t pid = fgpid(jobs);
     if (pid != 0) {
-        printf("Job [%d] (%d) stopped by signal %d\n",pid2jid(pid), pid, sig);
-        fflush(stdout);
         kill(-pid, SIGTSTP);
     }
     return;

@@ -1,0 +1,288 @@
+#
+# trace01.txt - Properly terminate on EOF.
+#
+#
+# trace02.txt - Process builtin quit command.
+#
+#
+# trace03.txt - Run a foreground job.
+#
+#
+# trace04.txt - Run a background job.
+#
+#
+# trace05.txt - Process jobs builtin command.
+#
+#
+# trace06.txt - Forward SIGINT to foreground job.
+#
+#
+# trace07.txt - Forward SIGINT only to foreground job.
+#
+#
+# trace08.txt - Forward SIGTSTP only to foreground job.
+#
+#
+# trace09.txt - Process bg builtin command
+#
+#
+# trace10.txt - Process fg builtin command. 
+#
+#
+# trace11.txt - Forward SIGINT to every process in foreground process group
+#
+#
+# trace12.txt - Forward SIGTSTP to every process in foreground process group
+#
+#
+# trace13.txt - Restart every stopped process in process group
+#
+#
+# trace14.txt - Simple error handling
+#
+#
+# trace15.txt - Putting it all together
+#
+#
+# trace16.txt - Tests whether the shell can handle SIGTSTP and SIGINT
+#     signals that come from other processes instead of the terminal.
+#
+make[1]:: Command not found
+#
+# trace01.txt - Properly terminate on EOF.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+#
+# trace02.txt - Process builtin quit command.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+#
+# trace03.txt - Run a foreground job.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+tsh>: Command not found
+#
+# trace04.txt - Run a background job.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+[1] (17654) tsh> ./myspin 1 &
+[2] (17655) [1] (26252) ./myspin 1 &
+tsh>: Command not found
+[1]: Command not found
+#
+# trace05.txt - Process jobs builtin command.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+[1] (17659) tsh> ./myspin 2 &
+[2] (17660) [1] (26256) ./myspin 2 &
+[3] (17661) tsh> ./myspin 3 &
+[4] (17662) [2] (26258) ./myspin 3 &
+tsh>: Command not found
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+tsh>: Command not found
+[1] (17664) [1] (26256) Running ./myspin 2 &
+[2] (17665) [2] (26258) Running ./myspin 3 &
+[1]: Command not found
+[2]: Command not found
+#
+# trace06.txt - Forward SIGINT to foreground job.
+#
+./tsh: invalid option -- ''
+Usage: shell [-hvp]
+   -h   print this message
+   -v   print additional diagnostic information
+   -p   do not emit a command prompt
+tsh>: Command not found
+Job: Command not found
+[1] (17697) tsh> ./myspin 4 &
+[2] (17698) [1] (26267) ./myspin 4 &
+[1]: Command not found
+tsh>: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1] (17702) [1] (26267) Running ./myspin 4 &
+[1]: Command not found
+[1] (17717) tsh> ./myspin 4 &
+[2] (17718) [1] (26274) ./myspin 4 &
+tsh>: Command not found
+[1]: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1] (17722) [1] (26274) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+[1] (17739) tsh> ./myspin 4 &
+[2] (17740) [1] (26281) ./myspin 4 &
+tsh>: Command not found
+tsh>: Command not found
+[1]: Command not found
+Job: Command not found
+tsh>: Command not found
+[1] (17744) [1] (26281) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+[2]: Command not found
+tsh>: Command not found
+[1] (17749) [1] (26281) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+[1] (17754) tsh> ./myspin 4 &
+[2] (17755) [1] (26290) ./myspin 4 &
+tsh>: Command not found
+[1]: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1] (17759) [1] (26290) Stopped ./myspin 4 &
+[1]: Command not found
+tsh>: Command not found
+tsh>: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+PID: Command not found
+25181: Command not found
+26239: Command not found
+26240: Command not found
+26241: Command not found
+26295: Command not found
+26296: Command not found
+26301: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1]: Command not found
+tsh>: Command not found
+PID: Command not found
+25181: Command not found
+26239: Command not found
+26240: Command not found
+26241: Command not found
+26302: Command not found
+26303: Command not found
+26305: Command not found
+26306: Command not found
+26309: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1]: Command not found
+tsh>: Command not found
+PID: Command not found
+25181: Command not found
+26239: Command not found
+26240: Command not found
+26241: Command not found
+26310: Command not found
+26311: Command not found
+26313: Command not found
+26314: Command not found
+26317: Command not found
+tsh>: Command not found
+tsh>: Command not found
+PID: Command not found
+25181: Command not found
+26239: Command not found
+26240: Command not found
+26241: Command not found
+26310: Command not found
+26311: Command not found
+26320: Command not found
+tsh>: Command not found
+./bogus:: Command not found
+[1] (17872) tsh> ./myspin 4 &
+[2] (17873) [1] (26326) ./myspin 4 &
+tsh>: Command not found
+tsh>: Command not found
+fg: argument must be a PID or %jobid
+[1]: Command not found
+tsh>: Command not found
+bg: argument must be a PID or %jobid
+tsh>: Command not found
+fg:: Command not found
+tsh>: Command not found
+bg:: Command not found
+tsh>: Command not found
+(9999999):: Command not found
+tsh>: Command not found
+(9999999):: Command not found
+tsh>: Command not found
+%2:: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+%2:: Command not found
+tsh>: Command not found
+[1] (17891) [1] (26326) ./myspin 4 &
+[1]: Command not found
+tsh>: Command not found
+[1] (17893) [1] (26326) Running ./myspin 4 &
+[1]: Command not found
+tsh>: Command not found
+./bogus:: Command not found
+tsh>: Command not found
+Job: Command not found
+[1] (17913) tsh> ./myspin 3 &
+[2] (17914) [1] (26345) ./myspin 3 &
+[3] (17915) tsh> ./myspin 4 &
+[4] (17916) [2] (26347) ./myspin 4 &
+tsh>: Command not found
+tsh>: Command not found
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+[1] (17918) [1] (26345) Running ./myspin 3 &
+[2] (17919) [2] (26347) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1] (17923) [1] (26345) Stopped ./myspin 3 &
+[2] (17924) [2] (26347) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+%3:: Command not found
+tsh>: Command not found
+[1] (17928) [1] (26345) ./myspin 3 &
+[1]: Command not found
+tsh>: Command not found
+[1] (17930) [1] (26345) Running ./myspin 3 &
+[2] (17931) [2] (26347) Running ./myspin 4 &
+[1]: Command not found
+[2]: Command not found
+tsh>: Command not found
+tsh>: Command not found
+tsh>: Command not found
+Job: Command not found
+tsh>: Command not found
+[1]: Command not found
+tsh>: Command not found
+Job: Command not found
+make[1]:: Command not found

@@ -24,11 +24,11 @@
  ********************************************************/
 team_t team = {
     /* Team name */
-    "ateam",
+    "Poppin' Party",
     /* First member's full name */
-    "Harry Bovik",
+    "Tab_1bit0",
     /* First member's email address */
-    "bovik@cs.cmu.edu",
+    "tab-ibito@github.com",
     /* Second member's full name (leave blank if none) */
     "",
     /* Second member's email address (leave blank if none) */
@@ -49,6 +49,7 @@ team_t team = {
  */
 int mm_init(void)
 {
+    void *p = mem_sbrk(int incr);
     return 0;
 }
 
