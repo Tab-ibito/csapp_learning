@@ -1,5 +1,7 @@
 # CSAPP Learning  
+
 ---
+*This document is specially for Chapter 2 of book CSAPP.*
 
 ## 认知上的一些补充
 对于一个32位（4B）的数字——  
@@ -84,3 +86,7 @@
 
 * floatFloat2Int() 特判+映射+加符号组合拳
 * floatPower2() 注意分类讨论
+
+---
+
+***By Tab_1bit0***

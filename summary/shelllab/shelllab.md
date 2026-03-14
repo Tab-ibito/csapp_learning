@@ -1,7 +1,6 @@
 # CSAPP Learning
 
 ---
-
 *The document is specially for ShellLab of book CSAPP.*
 
 ## 用法补充

@@ -1,5 +1,7 @@
 # CSAPP Learning
+
 ---
+*This document is specially for Chapter 5 of book CSAPP.*
 
 ## **Data-Flow Graphs**
 
@@ -105,5 +107,7 @@ for (i = 0; i < len; i++)
 
 创建临时变量存储临时结果，最后再把这个临时结果写进内存中  
 这是因为读取操作比较**费时间**，也比较容易有**依赖性**，我们需要减少不必要内存读取
+
+---
 
 ***By Tab_1bit0***

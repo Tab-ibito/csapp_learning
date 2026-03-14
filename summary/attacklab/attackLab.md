@@ -1,7 +1,7 @@
 # CSAPP Learning
 ---
 
-*This document is for attackLab.*
+*This document is specially for AttackLab of book CSAPP.*
 
 ## **Phase1**
 最简单情况，往里面填充40字节的垃圾信息，再把touch1的返回地址注入就可以了。
@@ -155,3 +155,7 @@ fa 18 40 00 00 00 00 00
 **遇到的问题：**  
 * `add_xy()` 的传参一开始忘记处理了，一定要记得扔给 %edi 和 %esi
 * 64位赋值不要写错地址成32位赋值，不然高位被置0很难受的说
+
+---
+
+***By Tab_1bit0***

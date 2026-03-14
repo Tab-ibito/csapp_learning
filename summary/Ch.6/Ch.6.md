@@ -1,6 +1,8 @@
 # CSAPP Learning
+
 ---
 *This document is specially for Cache in Chapter 6 of book CSAPP.*
+
 ## **Direct-Mapped Cache**
 
 现在我们假设有一个女仆咖啡厅，有1000个女仆服务员。
@@ -95,5 +97,7 @@
 * 多层循环嵌套的时候，关注执行次数最多的**最内层语句**
 
 ![alt text](image-6.png)
+
+---
 
 ***By Tab_1bit0***

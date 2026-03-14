@@ -1,12 +1,8 @@
 # CSAPP Learning
-<<<<<<< HEAD
----
-=======
 
 *This document is specially for Chapter 7 of book CSAPP.*
 ---
 
->>>>>>> a837a1752c4e561b5794f934e155f24686dafb6d
 ## 可重定位目标文件 Relocatable Object Files
 
 可重定位目标文件是经过**编译+汇编**之后得到的 `.o` 后缀名文件。
@@ -38,11 +34,9 @@ ELF Header包含**64字节**，剩下字节填充其他信息，例如Type可以
 * **.rodata**: 存放所有**read-only data**，switch语句的跳转表，printf语句的格式化字符串也都放在这里。
 * 其他的一些信息，其中重点关注
 * **.symtab 符号表**: 
-<<<<<<< HEAD
-![alt text](image-10.png)
-=======
+
 <img src="image-3.png" width="50%">
->>>>>>> a837a1752c4e561b5794f934e155f24686dafb6d
+
   * **LOCAL** - 局部的静态变量
   * **GLOBAL** - 全局变量
   * **UND** - Undefined，不在这个.c文件里面定义的
@@ -77,11 +71,7 @@ Symbols分为三类：
 我们规定，函数和已经初始化的全局变量为**强符号**，未初始化的全局变量为**弱符号**。
 * 多个强符号：**报错**
 * 一个强和多个弱符号：**以强为准**
-<<<<<<< HEAD
 * 多个弱符号：**未初始化，定义方法任意挑选**
-=======
-* 多个弱符号：**未初始化，数据类型任意挑选**
->>>>>>> a837a1752c4e561b5794f934e155f24686dafb6d
 
 实际上很显然，很容易出现**意料之外的程序运行结果**。
 
@@ -119,7 +109,6 @@ linux> gcc -static -o prog main.o ./libvector.a # 结束后自动引用libc.a
 静态库之间链状引用可能需要ABC的链接顺序，循环引用可能需要ABA的顺序。
 
 ### 链接器的工作过程（重定位）
-<<<<<<< HEAD
 
 分成两步：  
 #### 第一步是**重定位节和符号定义**。  
