@@ -75,7 +75,7 @@ typedef struct {
     char rio_buf[RIO_BUFSIZE]; /* Internal buffer */
 } rio_t;
 ```
-一次抓完**大量的**，然后再仔细处理，最后一行多出的部分存在 `rio_buf` 里面。
+一次抓完**大量的**，然后再仔细处理，抓取的内容都会存在 `rio_buf` 里面。
 
 这两种方法混用可能会导致**冲突打架**，因为有缓冲的是把数据存在结构体里。
 

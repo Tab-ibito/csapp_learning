@@ -1,3 +1,14 @@
+---
+title: "csapp 第6章 信息的存储"
+date: 2026-03-14
+draft: false
+description: ""
+
+layout: "background" 
+heroStyle: "background"
+showHero: true
+---
+
 # CSAPP Learning
 
 ---
